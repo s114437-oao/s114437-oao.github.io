@@ -1,239 +1,187 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>畢業旅行前的校園懸疑事件</title>
-
-<style>
-body{
-    font-family: Arial, sans-serif;
-    background:#f4f6f8;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-}
-
-.container{
-    background:white;
-    width:700px;
-    max-width:95%;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 0 15px rgba(0,0,0,0.1);
-}
-
-h1{
-    text-align:center;
-}
-
-#story{
-    font-size:20px;
-    margin:20px 0;
-    line-height:1.6;
-}
-
-button{
-    display:block;
-    width:100%;
-    margin:10px 0;
-    padding:12px;
-    font-size:16px;
-    cursor:pointer;
-    border:none;
-    border-radius:8px;
-    background:#4a90e2;
-    color:white;
-}
-
-button:hover{
-    background:#357abd;
-}
-
-#restart{
-    background:#28a745;
-}
-</style>
-</head>
-<body>
-
-<div class="container">
-
-<h1>🎓 畢業旅行前的校園懸疑事件</h1>
-
-<div id="story"></div>
-
-<div id="choices"></div>
-
-</div>
-
-<script>
-
-const game = {
-
-start:{
-text:`下週就是畢業旅行。
-
-班導突然發現旅行行程表和住宿名單不見了。
-
-如果今天找不到，畢旅可能被延後。
-
-你決定開始調查。`,
-choices:[
-["前往教室","classroom"],
-["前往教師辦公室","office"],
-["前往圖書館","library"]
-]
-},
-
-classroom:{
-text:`你詢問同學。
-
-同學表示午休時曾有人幫老師送資料。`,
-choices:[
-["去教師辦公室","office"],
-["去學生會辦公室","studentCouncil"]
-]
-},
-
-office:{
-text:`老師表示他把資料放在桌上後就去開會了。
+friendship = 0
+study = 0
+courage = 0
 
-另一位老師說看到有人拿著藍色資料夾離開。`,
-choices:[
-["查看監視器","camera"],
-["前往圖書館","library"]
-]
-},
+visited = set()
 
-library:{
-text:`圖書館管理員說下午有人影印過住宿名單。`,
-choices:[
-["前往影印室","copyRoom"],
-["前往學生會辦公室","studentCouncil"]
-]
-},
+def show_status():
+    print("\n===== 目前能力 =====")
+    print(f"友情值：{friendship}")
+    print(f"學業值：{study}")
+    print(f"勇氣值：{courage}")
+    print("===================\n")
 
-camera:{
-text:`監視器畫面顯示：
+while True:
 
-有人拿著藍色資料夾走進學生會辦公室。`,
-choices:[
-["前往學生會辦公室","studentCouncil"]
-]
-},
+    if len(visited) >= 6:
+        break
 
-studentCouncil:{
-text:`學生會長表示：
+    show_status()
 
-「我們收到資料後，以為是活動文件，所以轉交給活動組了。」`,
-choices:[
-["追查活動組","finalChoice"],
-["直接指控學生會","badEnding"]
-]
-},
+    print("=== 活動中心 ===")
+    print("即將升上高二，學生會舉辦神秘尋寶活動。")
+    print("請選擇要前往的地點：")
+    print("1. 圖書館")
+    print("2. 教室")
+    print("3. 操場")
+    print("4. 體育館")
+    print("5. 藝能大樓")
+    print("6. 實驗大樓")
+    print("7. 數學科辦公室")
 
-copyRoom:{
-text:`工讀生表示：
+    choice = input("選擇：")
 
-「確實有人影印資料，但影印後又放回資料夾了。」`,
-choices:[
-["追查活動組","finalChoice"],
-["認為是老師弄丟的","normalEnding"]
-]
-},
+    if choice == "1" and "圖書館" not in visited:
+        visited.add("圖書館")
 
-finalChoice:{
-text:`目前線索顯示：
+        print("\n你來到圖書館。")
+        print("你遇見正在讀書的學霸同學。")
 
-資料曾經經過學生會，最後被送往活動組。
+        print("1. 一起解題")
+        print("2. 翻閱舊畢冊")
 
-你決定怎麼做？`,
-choices:[
-["追查活動組","goodEnding"],
-["指控學生會","badEnding"],
-["認為老師自己弄丟","normalEnding"]
-]
-},
+        c = input("選擇：")
 
-goodEnding:{
-text:`🏆 真結局
+        if c == "1":
+            study += 2
+            print("你的學業值提升了！")
+        else:
+            friendship += 1
+            print("你發現學姊留下的祝福。")
 
-你找到活動組。
+    elif choice == "2" and "教室" not in visited:
+        visited.add("教室")
 
-原來資料被夾進畢旅海報設計稿中。
+        print("\n你回到熟悉的教室。")
+        print("同學們正在討論分班。")
 
-因為資料夾顏色相同，所以大家一直沒發現。
+        print("1. 安慰朋友")
+        print("2. 默默聽大家聊天")
 
-全班順利參加畢業旅行！`,
-choices:[]
-},
+        c = input("選擇：")
 
-normalEnding:{
-text:`🙂 普通結局
+        if c == "1":
+            friendship += 2
+        else:
+            study += 1
 
-老師最後重新整理文件。
+    elif choice == "3" and "操場" not in visited:
+        visited.add("操場")
 
-成功找到遺失資料。
+        print("\n接力隊正在練習。")
 
-畢旅照常舉行，但不是你找到的。`,
-choices:[]
-},
+        print("1. 加入訓練")
+        print("2. 在旁邊休息")
 
-badEnding:{
-text:`😅 壞結局
+        c = input("選擇：")
 
-你誤會了學生會。
+        if c == "1":
+            courage += 2
+        else:
+            friendship += 1
 
-後來證明他們只是按照流程轉交資料。
+    elif choice == "4" and "體育館" not in visited:
+        visited.add("體育館")
 
-真正原因仍然沒有被你找出。`,
-choices:[]
-}
+        print("\n體育館共有四層。")
+        print("1. 游泳池")
+        print("2. 籃球場")
+        print("3. 桌球場")
+        print("4. 羽球場")
 
-};
+        c = input("選擇：")
 
-function showScene(scene){
+        if c == "1":
+            courage += 2
 
-const current = game[scene];
+        elif c == "2":
+            friendship += 1
+            courage += 1
 
-document.getElementById("story").innerText = current.text;
+        elif c == "3":
+            study += 1
 
-const choicesDiv = document.getElementById("choices");
-choicesDiv.innerHTML = "";
+        elif c == "4":
+            courage += 1
+            friendship += 1
 
-current.choices.forEach(choice=>{
+    elif choice == "5" and "藝能大樓" not in visited:
+        visited.add("藝能大樓")
 
-const btn = document.createElement("button");
+        print("\n藝能大樓")
+        print("1. 音樂教室")
+        print("2. 美術教室")
+        print("3. 資訊教室")
 
-btn.innerText = choice[0];
+        c = input("選擇：")
 
-btn.onclick = ()=>showScene(choice[1]);
+        if c == "1":
+            friendship += 2
 
-choicesDiv.appendChild(btn);
+        elif c == "2":
+            courage += 1
+            friendship += 1
 
-});
+        elif c == "3":
+            study += 2
 
-if(current.choices.length===0){
+    elif choice == "6" and "實驗大樓" not in visited:
+        visited.add("實驗大樓")
 
-const restartBtn = document.createElement("button");
+        print("\n實驗大樓")
+        print("1. 物理實驗室")
+        print("2. 化學實驗室")
+        print("3. 生物實驗室")
 
-restartBtn.id = "restart";
+        c = input("選擇：")
 
-restartBtn.innerText = "重新開始";
+        if c == "1":
+            study += 2
 
-restartBtn.onclick = ()=>showScene("start");
+        elif c == "2":
+            study += 1
+            courage += 1
 
-choicesDiv.appendChild(restartBtn);
+        elif c == "3":
+            friendship += 1
+            study += 1
 
-}
+    elif choice == "7" and "數學科辦公室" not in visited:
+        visited.add("數學科辦公室")
 
-}
+        print("\n數學老師留下了一道謎題。")
 
-showScene("start");
+        answer = input("2 + 3 × 4 = ")
 
-</script>
+        if answer == "14":
+            study += 3
+            print("答對了！")
+        else:
+            print("答錯了。")
 
-</body>
-</html>
+    else:
+        print("此地點已探索或輸入錯誤。")
+
+print("\n====================")
+print("所有線索已收集完成。")
+print("你回到活動中心。")
+print("====================")
+
+show_status()
+
+if friendship >= study and friendship >= courage:
+    print("【友情結局】")
+    print("即使分班後，大家依然是最好的朋友。")
+
+elif study >= friendship and study >= courage:
+    print("【夢想結局】")
+    print("你找到自己的目標，勇敢朝夢想前進。")
+
+elif courage >= friendship and courage >= study:
+    print("【勇氣結局】")
+    print("你不再害怕改變，迎接新的挑戰。")
+
+if friendship >= 5 and study >= 5 and courage >= 5:
+    print("\n【真結局：青春的答案】")
+    print("你寫下一封給未來自己的信。")
+    print("『希望一年後的我，依然記得這段青春。』")
