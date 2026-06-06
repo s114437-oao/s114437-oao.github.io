@@ -1,66 +1,94 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <title>最後的夏天計畫</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>最後的夏天計畫</title>
 
-<div class="container">
-
-    <h1>最後的夏天計畫</h1>
-
-    <div id="story">
-        即將升上高二，學生會舉辦神秘尋寶活動。
-        請選擇要前往的地點。
-    </div>
-
-    <div id="stats">
-        友情值：<span id="friendship">0</span> |
-        學業值：<span id="study">0</span> |
-        勇氣值：<span id="courage">0</span>
-    </div>
-
-    <div id="choices"></div>
-
-</div>
-
-<script src="script.js"></script>
-
-</body>
-</html>
+<style>
 body{
-    font-family: 微軟正黑體;
-    background:#f5f7ff;
-    text-align:center;
+    font-family: "Microsoft JhengHei", sans-serif;
+    background:#f3f7ff;
+    margin:0;
+    padding:30px;
 }
 
 .container{
-    width:70%;
+    max-width:900px;
     margin:auto;
-    margin-top:50px;
+}
+
+h1{
+    text-align:center;
+    color:#3b4d8f;
 }
 
 #story{
     background:white;
     padding:20px;
-    border-radius:10px;
-    min-height:120px;
+    border-radius:15px;
+    min-height:180px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+    margin-bottom:20px;
+    line-height:1.8;
+}
+
+#stats{
+    background:white;
+    padding:15px;
+    border-radius:15px;
     margin-bottom:20px;
 }
 
 button{
-    margin:8px;
-    padding:10px 20px;
-    font-size:16px;
+    padding:12px 20px;
+    margin:6px;
+    border:none;
+    border-radius:10px;
+    background:#6d8cff;
+    color:white;
     cursor:pointer;
+    font-size:16px;
 }
 
-#stats{
-    margin-bottom:20px;
-    font-size:18px;
+button:hover{
+    background:#5472e6;
 }
+
+#choices{
+    text-align:center;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>🎓 最後的夏天計畫</h1>
+
+<div id="stats">
+友情值：<span id="friendship">0</span> |
+學業值：<span id="study">0</span> |
+勇氣值：<span id="courage">0</span>
+</div>
+
+<div id="story">
+高一下學期的最後一天。
+
+下週即將公布高二分班名單。
+
+學生會在活動中心宣布：
+
+「完成校園探索任務的人，將找到屬於自己的答案。」
+</div>
+
+<div id="choices"></div>
+
+</div>
+
+<script>
+
 let friendship = 0;
 let study = 0;
 let courage = 0;
@@ -70,39 +98,16 @@ let visited = [];
 const story = document.getElementById("story");
 const choices = document.getElementById("choices");
 
-function updateStats() {
-    document.getElementById("friendship").textContent = friendship;
-    document.getElementById("study").textContent = study;
-    document.getElementById("courage").textContent = courage;
+function updateStats(){
+    document.getElementById("friendship").innerText = friendship;
+    document.getElementById("study").innerText = study;
+    document.getElementById("courage").innerText = courage;
 }
 
-function showMainMenu() {
-
-    if (visited.length >= 6) {
-        ending();
-        return;
-    }
-
-    story.innerHTML = `
-    活動中心<br>
-    目前已探索 ${visited.length}/6 個地點
-    `;
-
-    choices.innerHTML = "";
-
-    addButton("圖書館", library);
-    addButton("教室", classroom);
-    addButton("操場", playground);
-    addButton("體育館", gym);
-    addButton("藝能大樓", artBuilding);
-    addButton("實驗大樓", labBuilding);
-    addButton("數學科辦公室", mathOffice);
-}
-
-function addButton(text, func){
-    let btn = document.createElement("button");
+function addButton(text, action){
+    const btn = document.createElement("button");
     btn.innerText = text;
-    btn.onclick = func;
+    btn.onclick = action;
     choices.appendChild(btn);
 }
 
@@ -112,25 +117,53 @@ function visit(place){
     }
 }
 
+function mainMenu(){
+
+    if(visited.length >= 7){
+        ending();
+        return;
+    }
+
+    choices.innerHTML = "";
+
+    story.innerHTML = `
+    <h2>📍活動中心</h2>
+    已探索地點：${visited.length}/7<br><br>
+    請選擇下一個地點。
+    `;
+
+    addButton("📚 圖書館", library);
+    addButton("🏫 教室", classroom);
+    addButton("🏃 操場", playground);
+    addButton("🏟 體育館", gym);
+    addButton("🎨 藝能大樓", artBuilding);
+    addButton("🧪 實驗大樓", labBuilding);
+    addButton("➗ 數學科辦公室", mathOffice);
+}
+
 function library(){
 
     visit("圖書館");
 
     story.innerHTML =
-    "你來到圖書館，遇見正在讀書的學霸同學。";
+    `
+    <h2>📚 圖書館</h2>
+    你遇見正在讀書的學霸同學。<br>
+    她邀請你一起研究分班考古題。
+    `;
 
     choices.innerHTML="";
 
     addButton("一起解題", ()=>{
         study += 2;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 
     addButton("翻閱舊畢冊", ()=>{
-        friendship += 1;
+        friendship += 2;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 }
 
@@ -139,20 +172,24 @@ function classroom(){
     visit("教室");
 
     story.innerHTML =
-    "同學們正在討論分班。";
+    `
+    <h2>🏫 教室</h2>
+    同學們正在討論分班。
+    有人擔心會和好朋友分開。
+    `;
 
     choices.innerHTML="";
 
     addButton("安慰朋友", ()=>{
         friendship += 2;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 
-    addButton("默默傾聽", ()=>{
+    addButton("討論讀書計畫", ()=>{
         study += 1;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 }
 
@@ -161,20 +198,23 @@ function playground(){
     visit("操場");
 
     story.innerHTML =
-    "接力隊正在練習。";
+    `
+    <h2>🏃 操場</h2>
+    接力隊正在為班際比賽練習。
+    `;
 
     choices.innerHTML="";
 
     addButton("加入訓練", ()=>{
         courage += 2;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 
-    addButton("在旁休息", ()=>{
+    addButton("替同學加油", ()=>{
         friendship += 1;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 }
 
@@ -183,34 +223,47 @@ function gym(){
     visit("體育館");
 
     story.innerHTML =
-    "體育館共有四層。";
+    `
+    <h2>🏟 體育館</h2>
+
+    1樓：游泳池<br>
+    2樓：籃球場、舞蹈教室<br>
+    3樓：桌球場<br>
+    4樓：羽球場
+    `;
 
     choices.innerHTML="";
 
-    addButton("游泳池", ()=>{
+    addButton("🏊 游泳池", ()=>{
         courage += 2;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 
-    addButton("籃球場", ()=>{
+    addButton("🏀 籃球場", ()=>{
         friendship += 1;
         courage += 1;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 
-    addButton("桌球場", ()=>{
+    addButton("💃 舞蹈教室", ()=>{
+        friendship += 2;
+        updateStats();
+        mainMenu();
+    });
+
+    addButton("🏓 桌球場", ()=>{
         study += 1;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 
-    addButton("羽球場", ()=>{
-        friendship += 1;
+    addButton("🏸 羽球場", ()=>{
         courage += 1;
+        friendship += 1;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 }
 
@@ -219,27 +272,31 @@ function artBuilding(){
     visit("藝能大樓");
 
     story.innerHTML =
-    "藝能大樓有三間教室。";
+    `
+    <h2>🎨 藝能大樓</h2>
+
+    音樂教室、美術教室、資訊教室。
+    `;
 
     choices.innerHTML="";
 
-    addButton("音樂教室", ()=>{
+    addButton("🎵 音樂教室", ()=>{
         friendship += 2;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 
-    addButton("美術教室", ()=>{
+    addButton("🖌 美術教室", ()=>{
         friendship += 1;
         courage += 1;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 
-    addButton("資訊教室", ()=>{
+    addButton("💻 資訊教室", ()=>{
         study += 2;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 }
 
@@ -248,28 +305,32 @@ function labBuilding(){
     visit("實驗大樓");
 
     story.innerHTML =
-    "實驗大樓有三間實驗室。";
+    `
+    <h2>🧪 實驗大樓</h2>
+
+    物理、化學、生物實驗室。
+    `;
 
     choices.innerHTML="";
 
-    addButton("物理實驗室", ()=>{
+    addButton("⚛️ 物理實驗室", ()=>{
         study += 2;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 
-    addButton("化學實驗室", ()=>{
+    addButton("🧫 化學實驗室", ()=>{
         study += 1;
         courage += 1;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 
-    addButton("生物實驗室", ()=>{
-        study += 1;
+    addButton("🧬 生物實驗室", ()=>{
         friendship += 1;
+        study += 1;
         updateStats();
-        showMainMenu();
+        mainMenu();
     });
 }
 
@@ -277,7 +338,7 @@ function mathOffice(){
 
     visit("數學科辦公室");
 
-    let answer = prompt("2 + 3 × 4 = ?");
+    let answer = prompt("老師留下謎題：2 + 3 × 4 = ?");
 
     if(answer === "14"){
         study += 3;
@@ -287,36 +348,51 @@ function mathOffice(){
     }
 
     updateStats();
-    showMainMenu();
+    mainMenu();
 }
 
 function ending(){
 
-    choices.innerHTML = "";
+    choices.innerHTML="";
+
+    story.innerHTML =
+    `
+    <h2>🎁 最終答案</h2>
+
+    學生會長拿出一個時光膠囊。
+
+    裡面裝著學姊們寫給未來自己的信。
+
+    你也寫下一封給高二的自己的信。
+    `;
 
     if(friendship >= study && friendship >= courage){
 
-        story.innerHTML =
-        "<h2>友情結局</h2>即使分班後，大家依然是最好的朋友。";
+        story.innerHTML +=
+        "<h3>❤️ 友情結局</h3>無論分班與否，朋友依然陪伴著你。";
 
     }else if(study >= friendship && study >= courage){
 
-        story.innerHTML =
-        "<h2>夢想結局</h2>你找到自己的目標。";
+        story.innerHTML +=
+        "<h3>📖 夢想結局</h3>你找到了未來努力的方向。";
 
     }else{
 
-        story.innerHTML =
-        "<h2>勇氣結局</h2>你勇敢迎接高二生活。";
+        story.innerHTML +=
+        "<h3>⭐ 勇氣結局</h3>你勇敢迎接未知的高二生活。";
     }
 
     if(friendship >= 5 && study >= 5 && courage >= 5){
 
         story.innerHTML +=
-        "<br><br><h2>真結局：青春的答案</h2>" +
-        "希望一年後的我，依然記得這段青春。";
+        "<h2>🌈 真結局：青春的答案</h2>希望一年後的我，依然記得這段青春。";
     }
 }
 
 updateStats();
-showMainMenu();
+mainMenu();
+
+</script>
+
+</body>
+</html>
