@@ -3,64 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>最後的夏天計畫</title>
+<title>最後的夏天計畫（簡易版）</title>
 
 <style>
 body{
-    font-family: "Microsoft JhengHei", sans-serif;
-    background:#f3f7ff;
-    margin:0;
+    font-family:"Microsoft JhengHei",sans-serif;
+    background:#f3f6ff;
     padding:30px;
 }
 
 .container{
-    max-width:900px;
+    max-width:800px;
     margin:auto;
 }
 
 h1{
     text-align:center;
-    color:#3b4d8f;
+    color:#4b5fc9;
 }
 
 #story{
     background:white;
     padding:20px;
-    border-radius:15px;
-    min-height:180px;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
+    border-radius:12px;
+    min-height:150px;
     margin-bottom:20px;
-    line-height:1.8;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
 }
 
 #stats{
     background:white;
     padding:15px;
-    border-radius:15px;
+    border-radius:12px;
     margin-bottom:20px;
 }
 
 button{
-    padding:12px 20px;
-    margin:6px;
+    padding:10px 18px;
+    margin:5px;
     border:none;
-    border-radius:10px;
+    border-radius:8px;
     background:#6d8cff;
     color:white;
     cursor:pointer;
-    font-size:16px;
 }
 
 button:hover{
-    background:#5472e6;
-}
-
-#choices{
-    text-align:center;
+    background:#4d6ff0;
 }
 </style>
-
 </head>
+
 <body>
 
 <div class="container">
@@ -74,7 +67,7 @@ button:hover{
 </div>
 
 <div id="story">
-高一下學期的最後一天。
+高一下學期最後一天。
 
 下週即將公布高二分班名單。
 
@@ -128,7 +121,8 @@ function mainMenu(){
 
     story.innerHTML = `
     <h2>📍活動中心</h2>
-    已探索地點：${visited.length}/7<br><br>
+    已探索地點：${visited.length}/7
+    <br><br>
     請選擇下一個地點。
     `;
 
@@ -148,8 +142,7 @@ function library(){
     story.innerHTML =
     `
     <h2>📚 圖書館</h2>
-    你遇見正在讀書的學霸同學。<br>
-    她邀請你一起研究分班考古題。
+    你遇見正在讀書的學霸同學。
     `;
 
     choices.innerHTML="";
@@ -175,7 +168,6 @@ function classroom(){
     `
     <h2>🏫 教室</h2>
     同學們正在討論分班。
-    有人擔心會和好朋友分開。
     `;
 
     choices.innerHTML="";
@@ -186,7 +178,7 @@ function classroom(){
         mainMenu();
     });
 
-    addButton("討論讀書計畫", ()=>{
+    addButton("討論暑假讀書計畫", ()=>{
         study += 1;
         updateStats();
         mainMenu();
@@ -200,7 +192,7 @@ function playground(){
     story.innerHTML =
     `
     <h2>🏃 操場</h2>
-    接力隊正在為班際比賽練習。
+    接力隊正在訓練。
     `;
 
     choices.innerHTML="";
@@ -211,7 +203,7 @@ function playground(){
         mainMenu();
     });
 
-    addButton("替同學加油", ()=>{
+    addButton("幫忙加油", ()=>{
         friendship += 1;
         updateStats();
         mainMenu();
@@ -226,10 +218,10 @@ function gym(){
     `
     <h2>🏟 體育館</h2>
 
-    1樓：游泳池<br>
-    2樓：籃球場、舞蹈教室<br>
-    3樓：桌球場<br>
-    4樓：羽球場
+    1樓 游泳池<br>
+    2樓 籃球場、舞蹈教室<br>
+    3樓 桌球場<br>
+    4樓 羽球場
     `;
 
     choices.innerHTML="";
@@ -274,7 +266,6 @@ function artBuilding(){
     story.innerHTML =
     `
     <h2>🎨 藝能大樓</h2>
-
     音樂教室、美術教室、資訊教室。
     `;
 
@@ -307,7 +298,6 @@ function labBuilding(){
     story.innerHTML =
     `
     <h2>🧪 實驗大樓</h2>
-
     物理、化學、生物實驗室。
     `;
 
@@ -359,34 +349,42 @@ function ending(){
     `
     <h2>🎁 最終答案</h2>
 
-    學生會長拿出一個時光膠囊。
+    學生會長拿出時光膠囊。
 
     裡面裝著學姊們寫給未來自己的信。
-
-    你也寫下一封給高二的自己的信。
     `;
 
     if(friendship >= study && friendship >= courage){
 
         story.innerHTML +=
-        "<h3>❤️ 友情結局</h3>無論分班與否，朋友依然陪伴著你。";
+        "<h3>❤️ 友情結局</h3>即使分班後，大家依然是最好的朋友。";
 
     }else if(study >= friendship && study >= courage){
 
         story.innerHTML +=
-        "<h3>📖 夢想結局</h3>你找到了未來努力的方向。";
+        "<h3>📖 學霸結局</h3>你找到了努力的方向。";
 
     }else{
 
         story.innerHTML +=
-        "<h3>⭐ 勇氣結局</h3>你勇敢迎接未知的高二生活。";
+        "<h3>⭐ 勇氣結局</h3>你勇敢迎接新的挑戰。";
     }
 
     if(friendship >= 5 && study >= 5 && courage >= 5){
 
         story.innerHTML +=
-        "<h2>🌈 真結局：青春的答案</h2>希望一年後的我，依然記得這段青春。";
+        "<h2>🌈 真結局：青春的答案</h2>";
     }
+
+    addButton("🔄 重新開始", ()=>{
+        friendship = 0;
+        study = 0;
+        courage = 0;
+        visited = [];
+
+        updateStats();
+        mainMenu();
+    });
 }
 
 updateStats();
