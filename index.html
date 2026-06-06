@@ -1,187 +1,167 @@
-friendship = 0
-study = 0
-courage = 0
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的校園冒險 - 互動劇情遊戲</title>
+    <style>
+        /* 簡單內建的 CSS 樣式，讓網頁看起來像復古遊戲機 */
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .game-container {
+            background-color: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 100%;
+            border: 2px solid #4a4a4a;
+        }
+        h1 {
+            color: #4ff0b0;
+            text-align: center;
+            margin-top: 0;
+            font-size: 24px;
+        }
+        .story-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            min-height: 100px;
+            white-space: pre-line; /* 保留換行 */
+        }
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        button {
+            background-color: #3a3a3a;
+            color: white;
+            border: 1px solid #5a5a5a;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+        button:hover {
+            background-color: #4ff0b0;
+            color: #1a1a1a;
+            font-weight: bold;
+            transform: translateX(5px);
+        }
+        .restart-btn {
+            background-color: #e74c3c;
+            text-align: center;
+        }
+        .restart-btn:hover {
+            background-color: #c0392b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
 
-visited = set()
+    <div class="game-container">
+        <h1>🏫 我的校園冒險 🏫</h1>
+        <hr style="border-color: #4a4a4a; margin-bottom: 20px;">
+        <div id="story" class="story-text">載入中...</div>
+        <div id="choices" class="choices-container"></div>
+    </div>
 
-def show_status():
-    print("\n===== 目前能力 =====")
-    print(f"友情值：{friendship}")
-    print(f"學業值：{study}")
-    print(f"勇氣值：{courage}")
-    print("===================\n")
+    <script>
+        // 遊戲劇情資料庫 (JavaScript 物件格式，邏輯跟 Python 完全一樣)
+        const storyData = {
+            "start": {
+                "text": "【第一章：遲到的早晨】\n響亮的鬧鐘聲把你吵醒。你揉揉眼睛看了一下手錶...天啊！已經 7:45 了！\n8:00 就是早自習抽考，你必須立刻做出決定：",
+                "choices": [
+                    {"text": "🍔 不管了！早餐最重要，先去巷口買大冰奶和蛋餅。", "next": "breakfast"},
+                    {"text": "🏃‍♂️ 直接使出全力狂奔，不吃早餐了！", "next": "run_to_school"}
+                ]
+            },
+            "breakfast": {
+                "text": "【第二章：致命的大冰奶】\n你悠閒地買了早餐，但大冰奶的威力非同小可...\n走到校門口時已經 8:10 了，教官正拿著記過本站在門口狠狠盯著你。",
+                "choices": [
+                    {"text": "🙇‍♂️ 誠實認錯，乖乖走過去給教官登記。", "next": "demerit"},
+                    {"text": "🥷 使出花式走位，試圖從側門溜進去。", "next": "side_gate"}
+                ]
+            },
+            "run_to_school": {
+                "text": "【第二章：教室前的安全歐皇】\n你發揮了空前的爆發力，在 7:59 成功踩進教室！\n這時，你的青梅竹馬「小晴」轉過頭來看著你，笑著說：「又差點遲到啦？喏，這顆御飯糰給你吃吧。」",
+                "choices": [
+                    {"text": "😊 高興地收下，並稱讚小晴真貼心。", "next": "good_ending_prep"},
+                    {"text": "😒 傲嬌地拒絕：「我...我才不需要咧！」", "next": "normal_ending_prep"}
+                ]
+            },
+            "demerit": {
+                "text": "❌【結局：乖學生的代價】\n你被教官記了一次警告，而且早自習抽考零分。\n更慘的是，因為沒吃早餐又被罰站，你餓到兩眼發昏。一整天都在悲劇中度過...",
+                "choices": [] 
+            },
+            "side_gate": {
+                "text": "🌹【結局：校園忍者】\n你成功繞到側門，翻牆時動作流暢。不幸的是，牆後面是校長的玫瑰花園。\n你直接跌坐在校長面前。校長微笑著對你說：「同學，身手不錯啊，來校長室喝茶吧。」",
+                "choices": []
+            },
+            "good_ending_prep": {
+                "text": "❤️【結局：閃光彈預備】\n你吃著小晴給的御飯糰，覺得今天的考試特別簡單。\n放學後，你們一起走在落日餘暉的校道上。看來，你的高中生活將會非常精彩！",
+                "choices": []
+            },
+            "normal_ending_prep": {
+                "text": "🍃【結局：鋼鐵直男的日常】\n小晴給了你一個白眼，把飯糰收了回去：「不吃拉倒！」\n肚子咕嚕嚕叫的你，撐過了悲慘的抽考。下午上課還因為太餓打瞌睡被老師罰站。看來傲嬌是要付出代價的...",
+                "choices": []
+            }
+        };
 
-while True:
+        let currentScene = "start";
 
-    if len(visited) >= 6:
-        break
+        // 渲染遊戲畫面的核心函式
+        function renderScene() {
+            const scene = storyData[currentScene];
+            const storyElement = document.getElementById("story");
+            const choicesContainer = document.getElementById("choices");
 
-    show_status()
+            // 顯示劇情文字
+            storyElement.innerText = scene.text;
+            
+            // 清空先前的按鈕
+            choicesContainer.innerHTML = "";
 
-    print("=== 活動中心 ===")
-    print("即將升上高二，學生會舉辦神秘尋寶活動。")
-    print("請選擇要前往的地點：")
-    print("1. 圖書館")
-    print("2. 教室")
-    print("3. 操場")
-    print("4. 體育館")
-    print("5. 藝能大樓")
-    print("6. 實驗大樓")
-    print("7. 數學科辦公室")
+            // 判斷是否為結局
+            if (scene.choices.length === 0) {
+                // 建立重新開始按鈕
+                const restartBtn = document.createElement("button");
+                restartBtn.innerText = "🔄 重新開始遊戲";
+                restartBtn.className = "restart-btn";
+                restartBtn.onclick = () => {
+                    currentScene = "start";
+                    renderScene();
+                };
+                choicesContainer.appendChild(restartBtn);
+            } else {
+                // 建立選擇肢按鈕
+                scene.choices.forEach(choice => {
+                    const btn = document.createElement("button");
+                    btn.innerText = choice.text;
+                    btn.onclick = () => {
+                        currentScene = choice.next;
+                        renderScene();
+                    };
+                    choicesContainer.appendChild(btn);
+                });
+            }
+        }
 
-    choice = input("選擇：")
-
-    if choice == "1" and "圖書館" not in visited:
-        visited.add("圖書館")
-
-        print("\n你來到圖書館。")
-        print("你遇見正在讀書的學霸同學。")
-
-        print("1. 一起解題")
-        print("2. 翻閱舊畢冊")
-
-        c = input("選擇：")
-
-        if c == "1":
-            study += 2
-            print("你的學業值提升了！")
-        else:
-            friendship += 1
-            print("你發現學姊留下的祝福。")
-
-    elif choice == "2" and "教室" not in visited:
-        visited.add("教室")
-
-        print("\n你回到熟悉的教室。")
-        print("同學們正在討論分班。")
-
-        print("1. 安慰朋友")
-        print("2. 默默聽大家聊天")
-
-        c = input("選擇：")
-
-        if c == "1":
-            friendship += 2
-        else:
-            study += 1
-
-    elif choice == "3" and "操場" not in visited:
-        visited.add("操場")
-
-        print("\n接力隊正在練習。")
-
-        print("1. 加入訓練")
-        print("2. 在旁邊休息")
-
-        c = input("選擇：")
-
-        if c == "1":
-            courage += 2
-        else:
-            friendship += 1
-
-    elif choice == "4" and "體育館" not in visited:
-        visited.add("體育館")
-
-        print("\n體育館共有四層。")
-        print("1. 游泳池")
-        print("2. 籃球場")
-        print("3. 桌球場")
-        print("4. 羽球場")
-
-        c = input("選擇：")
-
-        if c == "1":
-            courage += 2
-
-        elif c == "2":
-            friendship += 1
-            courage += 1
-
-        elif c == "3":
-            study += 1
-
-        elif c == "4":
-            courage += 1
-            friendship += 1
-
-    elif choice == "5" and "藝能大樓" not in visited:
-        visited.add("藝能大樓")
-
-        print("\n藝能大樓")
-        print("1. 音樂教室")
-        print("2. 美術教室")
-        print("3. 資訊教室")
-
-        c = input("選擇：")
-
-        if c == "1":
-            friendship += 2
-
-        elif c == "2":
-            courage += 1
-            friendship += 1
-
-        elif c == "3":
-            study += 2
-
-    elif choice == "6" and "實驗大樓" not in visited:
-        visited.add("實驗大樓")
-
-        print("\n實驗大樓")
-        print("1. 物理實驗室")
-        print("2. 化學實驗室")
-        print("3. 生物實驗室")
-
-        c = input("選擇：")
-
-        if c == "1":
-            study += 2
-
-        elif c == "2":
-            study += 1
-            courage += 1
-
-        elif c == "3":
-            friendship += 1
-            study += 1
-
-    elif choice == "7" and "數學科辦公室" not in visited:
-        visited.add("數學科辦公室")
-
-        print("\n數學老師留下了一道謎題。")
-
-        answer = input("2 + 3 × 4 = ")
-
-        if answer == "14":
-            study += 3
-            print("答對了！")
-        else:
-            print("答錯了。")
-
-    else:
-        print("此地點已探索或輸入錯誤。")
-
-print("\n====================")
-print("所有線索已收集完成。")
-print("你回到活動中心。")
-print("====================")
-
-show_status()
-
-if friendship >= study and friendship >= courage:
-    print("【友情結局】")
-    print("即使分班後，大家依然是最好的朋友。")
-
-elif study >= friendship and study >= courage:
-    print("【夢想結局】")
-    print("你找到自己的目標，勇敢朝夢想前進。")
-
-elif courage >= friendship and courage >= study:
-    print("【勇氣結局】")
-    print("你不再害怕改變，迎接新的挑戰。")
-
-if friendship >= 5 and study >= 5 and courage >= 5:
-    print("\n【真結局：青春的答案】")
-    print("你寫下一封給未來自己的信。")
-    print("『希望一年後的我，依然記得這段青春。』")
+        // 網頁載入後立刻執行遊戲
+        window.onload = renderScene;
+    </script>
+</body>
+</html>
