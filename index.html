@@ -2,166 +2,321 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的校園冒險 - 互動劇情遊戲</title>
-    <style>
-        /* 簡單內建的 CSS 樣式，讓網頁看起來像復古遊戲機 */
-        body {
-            background-color: #1a1a1a;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .game-container {
-            background-color: #2a2a2a;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 20px rgba(0,0,0,0.5);
-            max-width: 600px;
-            width: 100%;
-            border: 2px solid #4a4a4a;
-        }
-        h1 {
-            color: #4ff0b0;
-            text-align: center;
-            margin-top: 0;
-            font-size: 24px;
-        }
-        .story-text {
-            font-size: 18px;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            min-height: 100px;
-            white-space: pre-line; /* 保留換行 */
-        }
-        .choices-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        button {
-            background-color: #3a3a3a;
-            color: white;
-            border: 1px solid #5a5a5a;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s ease;
-        }
-        button:hover {
-            background-color: #4ff0b0;
-            color: #1a1a1a;
-            font-weight: bold;
-            transform: translateX(5px);
-        }
-        .restart-btn {
-            background-color: #e74c3c;
-            text-align: center;
-        }
-        .restart-btn:hover {
-            background-color: #c0392b;
-            color: white;
-        }
-    </style>
+    <title>最後的夏天計畫</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="game-container">
-        <h1>🏫 我的校園冒險 🏫</h1>
-        <hr style="border-color: #4a4a4a; margin-bottom: 20px;">
-        <div id="story" class="story-text">載入中...</div>
-        <div id="choices" class="choices-container"></div>
+<div class="container">
+
+    <h1>最後的夏天計畫</h1>
+
+    <div id="story">
+        即將升上高二，學生會舉辦神秘尋寶活動。
+        請選擇要前往的地點。
     </div>
 
-    <script>
-        // 遊戲劇情資料庫 (JavaScript 物件格式，邏輯跟 Python 完全一樣)
-        const storyData = {
-            "start": {
-                "text": "【第一章：遲到的早晨】\n響亮的鬧鐘聲把你吵醒。你揉揉眼睛看了一下手錶...天啊！已經 7:45 了！\n8:00 就是早自習抽考，你必須立刻做出決定：",
-                "choices": [
-                    {"text": "🍔 不管了！早餐最重要，先去巷口買大冰奶和蛋餅。", "next": "breakfast"},
-                    {"text": "🏃‍♂️ 直接使出全力狂奔，不吃早餐了！", "next": "run_to_school"}
-                ]
-            },
-            "breakfast": {
-                "text": "【第二章：致命的大冰奶】\n你悠閒地買了早餐，但大冰奶的威力非同小可...\n走到校門口時已經 8:10 了，教官正拿著記過本站在門口狠狠盯著你。",
-                "choices": [
-                    {"text": "🙇‍♂️ 誠實認錯，乖乖走過去給教官登記。", "next": "demerit"},
-                    {"text": "🥷 使出花式走位，試圖從側門溜進去。", "next": "side_gate"}
-                ]
-            },
-            "run_to_school": {
-                "text": "【第二章：教室前的安全歐皇】\n你發揮了空前的爆發力，在 7:59 成功踩進教室！\n這時，你的青梅竹馬「小晴」轉過頭來看著你，笑著說：「又差點遲到啦？喏，這顆御飯糰給你吃吧。」",
-                "choices": [
-                    {"text": "😊 高興地收下，並稱讚小晴真貼心。", "next": "good_ending_prep"},
-                    {"text": "😒 傲嬌地拒絕：「我...我才不需要咧！」", "next": "normal_ending_prep"}
-                ]
-            },
-            "demerit": {
-                "text": "❌【結局：乖學生的代價】\n你被教官記了一次警告，而且早自習抽考零分。\n更慘的是，因為沒吃早餐又被罰站，你餓到兩眼發昏。一整天都在悲劇中度過...",
-                "choices": [] 
-            },
-            "side_gate": {
-                "text": "🌹【結局：校園忍者】\n你成功繞到側門，翻牆時動作流暢。不幸的是，牆後面是校長的玫瑰花園。\n你直接跌坐在校長面前。校長微笑著對你說：「同學，身手不錯啊，來校長室喝茶吧。」",
-                "choices": []
-            },
-            "good_ending_prep": {
-                "text": "❤️【結局：閃光彈預備】\n你吃著小晴給的御飯糰，覺得今天的考試特別簡單。\n放學後，你們一起走在落日餘暉的校道上。看來，你的高中生活將會非常精彩！",
-                "choices": []
-            },
-            "normal_ending_prep": {
-                "text": "🍃【結局：鋼鐵直男的日常】\n小晴給了你一個白眼，把飯糰收了回去：「不吃拉倒！」\n肚子咕嚕嚕叫的你，撐過了悲慘的抽考。下午上課還因為太餓打瞌睡被老師罰站。看來傲嬌是要付出代價的...",
-                "choices": []
-            }
-        };
+    <div id="stats">
+        友情值：<span id="friendship">0</span> |
+        學業值：<span id="study">0</span> |
+        勇氣值：<span id="courage">0</span>
+    </div>
 
-        let currentScene = "start";
+    <div id="choices"></div>
 
-        // 渲染遊戲畫面的核心函式
-        function renderScene() {
-            const scene = storyData[currentScene];
-            const storyElement = document.getElementById("story");
-            const choicesContainer = document.getElementById("choices");
+</div>
 
-            // 顯示劇情文字
-            storyElement.innerText = scene.text;
-            
-            // 清空先前的按鈕
-            choicesContainer.innerHTML = "";
+<script src="script.js"></script>
 
-            // 判斷是否為結局
-            if (scene.choices.length === 0) {
-                // 建立重新開始按鈕
-                const restartBtn = document.createElement("button");
-                restartBtn.innerText = "🔄 重新開始遊戲";
-                restartBtn.className = "restart-btn";
-                restartBtn.onclick = () => {
-                    currentScene = "start";
-                    renderScene();
-                };
-                choicesContainer.appendChild(restartBtn);
-            } else {
-                // 建立選擇肢按鈕
-                scene.choices.forEach(choice => {
-                    const btn = document.createElement("button");
-                    btn.innerText = choice.text;
-                    btn.onclick = () => {
-                        currentScene = choice.next;
-                        renderScene();
-                    };
-                    choicesContainer.appendChild(btn);
-                });
-            }
-        }
-
-        // 網頁載入後立刻執行遊戲
-        window.onload = renderScene;
-    </script>
 </body>
 </html>
+body{
+    font-family: 微軟正黑體;
+    background:#f5f7ff;
+    text-align:center;
+}
+
+.container{
+    width:70%;
+    margin:auto;
+    margin-top:50px;
+}
+
+#story{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    min-height:120px;
+    margin-bottom:20px;
+}
+
+button{
+    margin:8px;
+    padding:10px 20px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+#stats{
+    margin-bottom:20px;
+    font-size:18px;
+}
+let friendship = 0;
+let study = 0;
+let courage = 0;
+
+let visited = [];
+
+const story = document.getElementById("story");
+const choices = document.getElementById("choices");
+
+function updateStats() {
+    document.getElementById("friendship").textContent = friendship;
+    document.getElementById("study").textContent = study;
+    document.getElementById("courage").textContent = courage;
+}
+
+function showMainMenu() {
+
+    if (visited.length >= 6) {
+        ending();
+        return;
+    }
+
+    story.innerHTML = `
+    活動中心<br>
+    目前已探索 ${visited.length}/6 個地點
+    `;
+
+    choices.innerHTML = "";
+
+    addButton("圖書館", library);
+    addButton("教室", classroom);
+    addButton("操場", playground);
+    addButton("體育館", gym);
+    addButton("藝能大樓", artBuilding);
+    addButton("實驗大樓", labBuilding);
+    addButton("數學科辦公室", mathOffice);
+}
+
+function addButton(text, func){
+    let btn = document.createElement("button");
+    btn.innerText = text;
+    btn.onclick = func;
+    choices.appendChild(btn);
+}
+
+function visit(place){
+    if(!visited.includes(place)){
+        visited.push(place);
+    }
+}
+
+function library(){
+
+    visit("圖書館");
+
+    story.innerHTML =
+    "你來到圖書館，遇見正在讀書的學霸同學。";
+
+    choices.innerHTML="";
+
+    addButton("一起解題", ()=>{
+        study += 2;
+        updateStats();
+        showMainMenu();
+    });
+
+    addButton("翻閱舊畢冊", ()=>{
+        friendship += 1;
+        updateStats();
+        showMainMenu();
+    });
+}
+
+function classroom(){
+
+    visit("教室");
+
+    story.innerHTML =
+    "同學們正在討論分班。";
+
+    choices.innerHTML="";
+
+    addButton("安慰朋友", ()=>{
+        friendship += 2;
+        updateStats();
+        showMainMenu();
+    });
+
+    addButton("默默傾聽", ()=>{
+        study += 1;
+        updateStats();
+        showMainMenu();
+    });
+}
+
+function playground(){
+
+    visit("操場");
+
+    story.innerHTML =
+    "接力隊正在練習。";
+
+    choices.innerHTML="";
+
+    addButton("加入訓練", ()=>{
+        courage += 2;
+        updateStats();
+        showMainMenu();
+    });
+
+    addButton("在旁休息", ()=>{
+        friendship += 1;
+        updateStats();
+        showMainMenu();
+    });
+}
+
+function gym(){
+
+    visit("體育館");
+
+    story.innerHTML =
+    "體育館共有四層。";
+
+    choices.innerHTML="";
+
+    addButton("游泳池", ()=>{
+        courage += 2;
+        updateStats();
+        showMainMenu();
+    });
+
+    addButton("籃球場", ()=>{
+        friendship += 1;
+        courage += 1;
+        updateStats();
+        showMainMenu();
+    });
+
+    addButton("桌球場", ()=>{
+        study += 1;
+        updateStats();
+        showMainMenu();
+    });
+
+    addButton("羽球場", ()=>{
+        friendship += 1;
+        courage += 1;
+        updateStats();
+        showMainMenu();
+    });
+}
+
+function artBuilding(){
+
+    visit("藝能大樓");
+
+    story.innerHTML =
+    "藝能大樓有三間教室。";
+
+    choices.innerHTML="";
+
+    addButton("音樂教室", ()=>{
+        friendship += 2;
+        updateStats();
+        showMainMenu();
+    });
+
+    addButton("美術教室", ()=>{
+        friendship += 1;
+        courage += 1;
+        updateStats();
+        showMainMenu();
+    });
+
+    addButton("資訊教室", ()=>{
+        study += 2;
+        updateStats();
+        showMainMenu();
+    });
+}
+
+function labBuilding(){
+
+    visit("實驗大樓");
+
+    story.innerHTML =
+    "實驗大樓有三間實驗室。";
+
+    choices.innerHTML="";
+
+    addButton("物理實驗室", ()=>{
+        study += 2;
+        updateStats();
+        showMainMenu();
+    });
+
+    addButton("化學實驗室", ()=>{
+        study += 1;
+        courage += 1;
+        updateStats();
+        showMainMenu();
+    });
+
+    addButton("生物實驗室", ()=>{
+        study += 1;
+        friendship += 1;
+        updateStats();
+        showMainMenu();
+    });
+}
+
+function mathOffice(){
+
+    visit("數學科辦公室");
+
+    let answer = prompt("2 + 3 × 4 = ?");
+
+    if(answer === "14"){
+        study += 3;
+        alert("答對了！");
+    }else{
+        alert("答錯了！");
+    }
+
+    updateStats();
+    showMainMenu();
+}
+
+function ending(){
+
+    choices.innerHTML = "";
+
+    if(friendship >= study && friendship >= courage){
+
+        story.innerHTML =
+        "<h2>友情結局</h2>即使分班後，大家依然是最好的朋友。";
+
+    }else if(study >= friendship && study >= courage){
+
+        story.innerHTML =
+        "<h2>夢想結局</h2>你找到自己的目標。";
+
+    }else{
+
+        story.innerHTML =
+        "<h2>勇氣結局</h2>你勇敢迎接高二生活。";
+    }
+
+    if(friendship >= 5 && study >= 5 && courage >= 5){
+
+        story.innerHTML +=
+        "<br><br><h2>真結局：青春的答案</h2>" +
+        "希望一年後的我，依然記得這段青春。";
+    }
+}
+
+updateStats();
+showMainMenu();
