@@ -39,9 +39,10 @@ button{padding:8px 12px}
 </div>
 
 <!-- 座標依圖片 1000×700 比例校正 -->
-<svg viewBox="0 0 1000 700" preserveAspectRatio="none">
+<div class="map-container">
+  <img src="map.png" alt="校園地圖" class="map-image">
 
-<a href="#art" class="clickable-area" style="left: 22%; top: 13%; width: 18%; height: 12%;" title="藝能大樓"></a>
+  <a href="#art" class="clickable-area" style="left: 22%; top: 13%; width: 18%; height: 12%;" title="藝能大樓"></a>
   <a href="#volleyball" class="clickable-area" style="left: 52%; top: 24%; width: 11%; height: 13%;" title="排球場"></a>
   <a href="#basketball" class="clickable-area" style="left: 15%; top: 22%; width: 6%; height: 25%;" title="籃球場"></a>
   <a href="#gym" class="clickable-area" style="left: 2%; top: 41%; width: 13%; height: 19%;" title="體育館"></a>
@@ -51,6 +52,38 @@ button{padding:8px 12px}
   <a href="#library" class="clickable-area" style="left: 39%; top: 67%; width: 8%; height: 14%;" title="圖書館"></a>
   <a href="#banyan" class="clickable-area" style="left: 48%; top: 68%; width: 8%; height: 13%;" title="榕園"></a>
   <a href="#science" class="clickable-area" style="left: 57%; top: 64%; width: 10%; height: 18%;" title="實驗中心"></a>
+</div>
+
+<style>
+  /* 容器需設定為 relative，這樣內部的絕對定位才會以它為基準 */
+  .map-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px; /* 可依你的版面需求調整 */
+    margin: 0 auto;
+  }
+  
+  .map-image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  /* 點擊區域的基本設定 */
+  .clickable-area {
+    position: absolute;
+    display: block;
+    cursor: pointer;
+    /* 開發測試用：顯示半透明紅色區塊以便對齊，完成後可註解或刪除 */
+    background-color: rgba(255, 0, 0, 0.3); 
+    border-radius: 8px; /* 讓邊角稍微圓潤一點 */
+  }
+
+  /* 滑鼠移過去時的提示效果 */
+  .clickable-area:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+</style>
 
 </svg>
 
