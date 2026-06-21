@@ -2,12 +2,12 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>最後的夏天計畫 - 互動文字遊戲</title>
   <style>
     :root {
       --primary-color: #4a6fa5;
-      --bg-color: #f4f7f6;
+      --bg-color: #e5e9f0;
       --text-color: #333;
       --card-bg: #ffffff;
     }
@@ -19,23 +19,21 @@
       font-family: "Microsoft JhengHei", sans-serif;
     }
 
+    /* --- 滿版佈局核心設定 --- */
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      height: 100vh; /* 滿版高度 */
+      width: 100vw;  /* 滿版寬度 */
+      overflow: hidden; /* 防止整個頁面出現外層捲軸 */
     }
 
     #game-container {
       width: 100%;
-      max-width: 1100px;
+      height: 100%;
       background: var(--card-bg);
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      overflow: hidden;
       display: flex;
       flex-direction: column;
     }
@@ -48,6 +46,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0; /* 確保標題列不會被壓縮 */
     }
 
     header h1 {
@@ -72,17 +71,26 @@
     .main-content {
       display: flex;
       flex-direction: row;
-      min-height: 550px;
+      flex: 1; /* 填滿標題列以下的剩餘空間 */
+      overflow: hidden;
     }
 
     /* 左側地圖區 */
     .map-wrapper {
-      flex: 1.8;
-      position: relative;
-      background: #e5e9f0;
+      flex: 1.5; /* 佔據比例可微調 */
+      background: var(--bg-color);
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: auto; /* 允許地圖區內部滾動 */
+      padding: 10px;
+    }
+
+    /* 增加這層容器來鎖定比例，確保座標絕對準確 */
+    .map-inner-container {
+      position: relative;
+      width: 100%;
+      max-width: 900px; /* 防止在大螢幕上地圖被無限放大變模糊 */
     }
 
     .map-image {
@@ -91,57 +99,57 @@
       display: block;
     }
 
-    /* 點擊區域基本樣式 */
+    /* --- 點擊區域樣式修改 (透明化) --- */
     .clickable-area {
       position: absolute;
       cursor: pointer;
-      /* 開發測試用：顯示半透明紅色區塊，確認沒問題後可將下方改為 rgba(0,0,0,0) */
-      background-color: rgba(255, 0, 0, 0.25);
-      border: 1px dashed rgba(255, 0, 0, 0.5);
+      background-color: transparent; /* 變成完全透明 */
+      border: none; /* 移除虛線邊框 */
       border-radius: 6px;
       transition: all 0.2s;
     }
 
+    /* 保留滑鼠移過時微微發亮的提示感，讓玩家知道可以點擊 */
     .clickable-area:hover {
-      background-color: rgba(74, 111, 165, 0.4);
-      border: 1px solid #4a6fa5;
+      background-color: rgba(255, 255, 255, 0.3);
     }
 
     /* 右側敘事與對話面板 */
     .story-panel {
-      flex: 1.2;
-      padding: 25px;
+      flex: 1;
+      padding: 30px;
       display: flex;
       flex-direction: column;
-      justify-content:间-between;
       border-left: 1px solid #e0e0e0;
       background: #fafafa;
+      overflow-y: auto; /* 劇情文字太長時可獨立滾動 */
     }
 
     .story-text {
       font-size: 1.1rem;
       line-height: 1.6;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       white-space: pre-line;
     }
 
     .location-title {
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       color: var(--primary-color);
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       font-weight: bold;
       border-bottom: 2px solid var(--primary-color);
-      padding-bottom: 5px;
+      padding-bottom: 8px;
     }
 
     .options-container {
       display: flex;
       flex-direction: column;
       gap: 12px;
+      margin-top: auto; /* 把按鈕推到面板底部 */
     }
 
     button {
-      padding: 12px 18px;
+      padding: 14px 18px;
       font-size: 1rem;
       background: #ffffff;
       border: 2px solid var(--primary-color);
@@ -199,25 +207,44 @@
       max-width: 700px;
       text-align: center;
       min-height: 100px;
-      color: #c5a880; /* 金色調語錄 */
+      color: #c5a880;
     }
 
     .restart-btn {
-      margin-top: 5px;
+      margin-top: 20px;
       background: transparent;
       border: 1px solid #fff;
       color: #fff;
-      padding: 10px 20px;
+      padding: 12px 24px;
       display: none;
+      text-align: center;
     }
     .restart-btn:hover {
       background: #fff;
       color: #000;
     }
 
+    /* --- 手機版響應式設計 (RWD) --- */
     @media (max-width: 768px) {
-      .main-content { flex-direction: column; }
-      .story-panel { border-left: none; border-top: 1px solid #e0e0e0; }
+      .main-content { 
+        flex-direction: column; 
+        overflow-y: auto; /* 手機版讓整體可以上下滑動 */
+      }
+      .map-wrapper {
+        flex: none;
+        overflow: visible;
+        padding: 15px;
+      }
+      .story-panel { 
+        flex: none;
+        border-left: none; 
+        border-top: 2px solid #e0e0e0; 
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
     }
   </style>
 </head>
@@ -225,8 +252,8 @@
 
   <div id="game-container">
     <header>
-      <div id="game-title">《最後的夏天計畫》</div>
-      <div style="display: flex; align-items: center; gap: 15px;">
+      <div id="game-title" style="font-weight: bold;">《最後的夏天計畫》</div>
+      <div style="display: flex; align-items: center; gap: 10px;">
         <span>🎒 已收集的回憶碎片：</span>
         <div class="backpack" id="backpack">（空無一物）</div>
       </div>
@@ -234,18 +261,20 @@
 
     <div class="main-content">
       <div class="map-wrapper" id="map-wrapper">
-        <img src="map.png" alt="請放入校園地圖 map.png" class="map-image" onerror="this.style.height='550px'; this.style.background='#ccc';">
-        
-        <div class="clickable-area" style="left: 22%; top: 13%; width: 18%; height: 12%;" onclick="game.triggerEvent('art')" title="藝能大樓"></div>
-        <div class="clickable-area" style="left: 52%; top: 24%; width: 11%; height: 13%;" onclick="game.triggerEvent('volleyball')" title="排球場"></div>
-        <div class="clickable-area" style="left: 15%; top: 22%; width: 6%; height: 25%;" onclick="game.triggerEvent('basketball')" title="籃球場"></div>
-        <div class="clickable-area" style="left: 2%; top: 41%; width: 13%; height: 19%;" onclick="game.triggerEvent('gym')" title="體育館"></div>
-        <div class="clickable-area" style="left: 24%; top: 26%; width: 19%; height: 39%;" onclick="game.triggerEvent('track')" title="田徑場"></div>
-        <div class="clickable-area" style="left: 50%; top: 42%; width: 16%; height: 18%;" onclick="game.triggerEvent('activity')" title="學生活動中心"></div>
-        <div class="clickable-area" style="left: 4%; top: 67%; width: 31%; height: 18%;" onclick="game.triggerEvent('general')" title="綜合大樓"></div>
-        <div class="clickable-area" style="left: 39%; top: 67%; width: 8%; height: 14%;" onclick="game.triggerEvent('library')" title="圖書館"></div>
-        <div class="clickable-area" style="left: 48%; top: 68%; width: 8%; height: 13%;" onclick="game.triggerEvent('banyan')" title="榕園"></div>
-        <div class="clickable-area" style="left: 57%; top: 64%; width: 10%; height: 18%;" onclick="game.triggerEvent('science')" title="實驗中心"></div>
+        <div class="map-inner-container">
+          <img src="map.png" alt="校園地圖" class="map-image" onerror="this.style.height='300px'; this.style.background='#ccc';">
+          
+          <div class="clickable-area" style="left: 22%; top: 13%; width: 18%; height: 12%;" onclick="game.triggerEvent('art')" title="藝能大樓"></div>
+          <div class="clickable-area" style="left: 52%; top: 24%; width: 11%; height: 13%;" onclick="game.triggerEvent('volleyball')" title="排球場"></div>
+          <div class="clickable-area" style="left: 15%; top: 22%; width: 6%; height: 25%;" onclick="game.triggerEvent('basketball')" title="籃球場"></div>
+          <div class="clickable-area" style="left: 2%; top: 41%; width: 13%; height: 19%;" onclick="game.triggerEvent('gym')" title="體育館"></div>
+          <div class="clickable-area" style="left: 24%; top: 26%; width: 19%; height: 39%;" onclick="game.triggerEvent('track')" title="田徑場"></div>
+          <div class="clickable-area" style="left: 50%; top: 42%; width: 16%; height: 18%;" onclick="game.triggerEvent('activity')" title="學生活動中心"></div>
+          <div class="clickable-area" style="left: 4%; top: 67%; width: 31%; height: 18%;" onclick="game.triggerEvent('general')" title="綜合大樓"></div>
+          <div class="clickable-area" style="left: 39%; top: 67%; width: 8%; height: 14%;" onclick="game.triggerEvent('library')" title="圖書館"></div>
+          <div class="clickable-area" style="left: 48%; top: 68%; width: 8%; height: 13%;" onclick="game.triggerEvent('banyan')" title="榕園"></div>
+          <div class="clickable-area" style="left: 57%; top: 64%; width: 10%; height: 18%;" onclick="game.triggerEvent('science')" title="實驗中心"></div>
+        </div>
       </div>
 
       <div class="story-panel">
@@ -266,311 +295,6 @@
   </div>
 
   <script>
-    // 完整的劇情與事件資料庫
     const scriptData = {
       start: {
-        title: "故事開始",
-        text: "今天是高一下學期的最後一天。\n下週就要公布高二分班名單了，校園裡瀰漫著焦慮與不安。\n\n此時，學生會長在活動中心台上宣布：\n『今年的分班前活動正式開始。完成校園探索任務的人，將找到屬於自己的答案。』\n\n點擊左側地圖上的建築物，開始探索校園吧！",
-        choices: [
-          { text: "開始探索校園", action: "goToMap" }
-        ]
-      },
-      mapIdle: {
-        title: "校園地圖探索中",
-        text: "請點擊左側地圖上的建築物前往不同地點探索。\n當你探索完足夠的地方（至少3處），可以回到【學生活動中心】觸發最終章結算。",
-        choices: []
-      },
-      // 10個地點的專屬事件
-      activity: {
-        title: "學生活動中心",
-        text: "舞台上放著大型倒數計時器，學生會的成員正在忙碌著。\n如果你已經準備好面對高一生活的總結，就在這裡提交信件吧。",
-        getChoices: () => {
-          if (game.state.visitedCount >= 3) {
-            return [
-              { text: "【最終章】回到這裡，寫下交給未來的信", action: "triggerFinalEnding" },
-              { text: "繼續在校園四處看看", action: "goToMap" }
-            ];
-          } else {
-            return [
-              { text: "（需要至少探索3個其他地點才能進行最終結算）", action: "goToMap" }
-            ];
-          }
-        }
-      },
-      library: {
-        title: "圖書館",
-        text: "一進門就看到埋頭苦讀的學霸同學，他身旁堆滿了書，似乎正在尋找一年前開學時借閱的某一本書，藉此回顧起點。",
-        choices: [
-          { text: "主動幫學霸一起尋找舊書，聊聊當初入學時的目標", tag: "dream", label: "初衷", nextText: "你們找到了書，書籤上寫著他當時的宏大目標。這讓你開始認真審視自己這一年來的學業與方向。\n獲得碎片：【初衷】" },
-          { text: "坐下來陪他聊聊對於未來分班、人際關係重新洗牌的擔憂", tag: "bond", label: "傾聽", nextText: "學霸停下筆，溫柔地聆聽你的煩惱，並分享了他對人際交往的看法。你們的距離拉近了。\n獲得碎片：【傾聽】" }
-        ]
-      },
-      general: {
-        title: "綜合大樓 (教室)",
-        text: "這是高一（某班）的最後一次班會。同學們七嘴八舌地討論著分班名單，空氣中有些浮躁。",
-        choices: [
-          { text: "走到座位旁，安慰看起來非常焦慮的青梅竹馬", tag: "bond", label: "約定", nextText: "你拉著老朋友的手說：『不管分到哪班，我們都是最好的朋友。』對方感動地笑了。\n獲得碎片：【約定】" },
-          { text: "默默回到自己的位置整理置物櫃，發現了一張當時入學時寫下的便利貼", tag: "courage", label: "邁出一步", nextText: "便利貼上寫著對高中生活的恐懼。你笑了笑，將它折好放進口袋，心裡似乎踏實了點。\n獲得碎片：【邁出一步】" }
-        ]
-      },
-      science: {
-        title: "實驗中心",
-        text: "理科實驗室裡，老師留下了自由操作的光學與化學器材。這是一場需要高度專注或打破常規的解謎。",
-        choices: [
-          { text: "冷靜、專注地調整稜鏡，完成複雜的光線反射解謎", tag: "dream", label: "專注", nextText: "經過數次失敗，光線完美折射出一個清晰的座標。你體會到了專心致志解鎖目標的成就感。\n獲得碎片：【專注】" },
-          { text: "勇敢打破常規，將兩種未知的安全試劑混合觀察變化", tag: "courage", label: "深呼吸", nextText: "試管裡冒出漂亮的紫色泡泡，並浮現出隱藏密碼。你明白有時候跨出舒適圈需要深呼吸的勇氣。\n獲得碎片：【深呼吸】" }
-        ]
-      },
-      gym: {
-        title: "體育館",
-        text: "班際友誼賽剛結束，班上的體育風雲人物、球隊隊長坐在長椅上揉著扭傷的腳踝，神情有些落寞。",
-        choices: [
-          { text: "拿來冰袋幫他冰敷，坐在長椅上陪他聊天看著空盪的球場", tag: "bond", label: "褪色的合照", nextText: "隊長由衷地感謝你的陪伴，他拿出手機跟你在球場合照了一張。這是一年來汗水與友誼的證明。\n獲得碎片：【褪色的合照】" },
-          { text: "接過隊長手上的球衣，代替受傷的他上場拚搏最後一刻", tag: "courage", label: "起跑線", nextText: "你頂著壓力上場，雖然最後沒能反敗為勝，但你在哨音響起的那刻，感受到了站在起跑線上的熱血。\n獲得碎片：【起跑線】" }
-        ]
-      },
-      track: {
-        title: "田徑場",
-        text: "夕陽逐漸西下，大操場上接力賽跑隊正在進行高一下學期的最後一場模擬訓練。",
-        choices: [
-          { text: "脫下外套，接受邀請加入接力隊，在跑道上盡情揮灑汗水", tag: "courage", label: "突破", nextText: "迎著風奔跑，你在交棒的那一刻超越了平時的自己。迎向高二，你不再那麼害怕改變了。\n獲得碎片：【突破】" },
-          { text: "站在跑道旁當啦啦隊，幫奔跑的同學們遞水、大聲加油", tag: "bond", label: "陪伴", nextText: "同學們跑過終點後紛紛圍過來擁抱你，感謝你一整年來總是扮演大家最強大的後盾。\n獲得碎片：【陪伴】" }
-        ]
-      },
-      art: {
-        title: "藝能大樓",
-        text: "走廊上正展示著學長姊的畢業畫展。走廊盡頭的音樂教室傳來一陣悠揚但有些迷惘的鋼琴聲。",
-        choices: [
-          { text: "駐足在美術教室，仔細欣賞一幅描繪『未來星空』的畫作", tag: "dream", label: "解開的方程式", nextText: "畫作底下的註解點醒了你，人生就像複雜的方程式，答案需要自己一筆一劃去解開。\n獲得碎片：【解開的方程式】" },
-          { text: "走進資訊教室，嘗試破解學生會留在舊電腦裡的加密隱藏訊息", tag: "dream", label: "筆記本", nextText: "經過一番邏輯推導，你成功解鎖了一份電子筆記本，裡面記錄著無數前人追尋夢想的足跡。\n獲得碎片：【筆記本】" }
-        ]
-      },
-      volleyball: {
-        title: "排球場",
-        text: "幾位同學正在練習低空墊球，球落在了你腳邊。他們笑著向你招手，問你要不要加入。",
-        choices: [
-          { text: "加入他們，一起完成連續10個球不落地的團隊挑戰", tag: "bond", label: "默契", nextText: "『接得好！』在一聲聲歡呼中，球完美傳遞。你體會到了團隊默契帶來的踏實感。\n獲得碎片：【默契】" },
-          { text: "謝過好意，獨自坐在排球場旁的石椅上，觀察落葉寫下此時心情", tag: "dream", label: "沉澱", nextText: "微風吹過，你在筆記本上寫下對高二的期許。這份短暫的沉澱讓你的目標更加清晰。\n獲得碎片：【沉澱】" }
-        ]
-      },
-      basketball: {
-        title: "籃球場",
-        text: "烈日下的籃球場上，神秘的學生會成員正一個人投著三分球。看到你走過來，他把球傳給了你。",
-        choices: [
-          { text: "深吸一口氣，站在高難度的三分線外嘗試投籃", tag: "courage", label: "挑戰未知", nextText: "籃球劃出一道高高的弧線空心入網！學生會成員拍手說：『看吧，不試試看怎麼知道呢？』\n獲得碎片：【挑戰未知】" },
-          { text: "接過球，切入上籃，選擇最穩健且熟練的方式拿下一分", tag: "dream", label: "踏實", nextText: "球穩穩擦板得分。學生會成員點點頭：『基礎紮實，才能走得更遠。高二也是如此。』\n獲得碎片：【踏實】" }
-        ]
-      },
-      banyan: {
-        title: "榕園",
-        text: "百年大榕樹下，樹影婆娑。這裡通常是告別與沉思的地方。你看到樹幹上繫著許多彩帶。",
-        choices: [
-          { text: "走上前仔細閱讀彩帶上學長姐留下的祝福與對青春的遺憾", tag: "bond", label: "共鳴", nextText: "字裡行間滿是對陪伴的珍惜。你暗自發誓，一定要好好把握身邊這群重要的人。\n獲得碎片：【共鳴】" },
-          { text: "在樹下閉上眼睛，感受風的流動，勇敢面對自己內心的焦慮", tag: "courage", label: "平靜", nextText: "睜開眼時，焦慮似乎隨風消散了。你知道自己已經累積了足夠面對明天的勇氣。\n獲得碎片：【平靜】" }
-        ]
-      }
-    };
-
-    // 遊戲核心邏輯控制
-    class InteractiveGame {
-      constructor() {
-        this.state = {
-          visited: {},       // 記錄去過的地點
-          visitedCount: 0,   // 已探索地點總數
-          tags: {
-            bond: 0,         // 原友情值
-            dream: 0,        // 原學業值 (改夢想目標)
-            courage: 0       // 原勇氣值
-          },
-          collectedLabels: [] // 背包裡的文字碎片
-        };
-      }
-
-      init() {
-        this.renderStory('start');
-      }
-
-      // 渲染劇情面板
-      renderStory(key) {
-        const data = scriptData[key];
-        if (!data) return;
-
-        // 設定標題與內文
-        document.getElementById('location-title').innerText = data.title;
-        document.getElementById('story-text').innerText = data.text;
-
-        const optionsContainer = document.getElementById('options-container');
-        optionsContainer.innerHTML = '';
-
-        // 處理動態生成（如活動中心需要判斷條件）
-        const finalChoices = data.getChoices ? data.getChoices() : data.choices;
-
-        // 生成選項按鈕
-        if (finalChoices && finalChoices.length > 0) {
-          finalChoices.forEach(choice => {
-            const btn = document.createElement('button');
-            btn.innerText = choice.text;
-            btn.onclick = () => this.makeChoice(choice, key);
-            optionsContainer.appendChild(btn);
-          });
-        } else {
-          // 如果沒有選項，預設提供返回地圖按鈕
-          const backBtn = document.createElement('button');
-          backBtn.innerText = "🗺️ 返回校園地圖";
-          backBtn.className = "nav-btn";
-          backBtn.onclick = () => this.renderStory('mapIdle');
-          optionsContainer.appendChild(backBtn);
-        }
-      }
-
-      // 地圖點擊事件觸發
-      triggerEvent(locationKey) {
-        if (this.state.visited[locationKey] && locationKey !== 'activity') {
-          document.getElementById('location-title').innerText = scriptData[locationKey].title;
-          document.getElementById('story-text').innerText = "這個地方你今天已經探索過了，回憶的碎片也已經收進背包。\n去其他地方看看吧！";
-          document.getElementById('options-container').innerHTML = '';
-          const backBtn = document.createElement('button');
-          backBtn.innerText = "🗺️ 返回校園地圖";
-          backBtn.className = "nav-btn";
-          backBtn.onclick = () => this.renderStory('mapIdle');
-          document.getElementById('options-container').appendChild(backBtn);
-          return;
-        }
-        this.renderStory(locationKey);
-      }
-
-      // 玩家做出選擇
-      makeChoice(choice, currentKey) {
-        if (choice.action === 'goToMap') {
-          this.renderStory('mapIdle');
-          return;
-        }
-        if (choice.action === 'triggerFinalEnding') {
-          this.calculateEnding();
-          return;
-        }
-
-        // 核心選擇邏輯：獲得隱藏標籤與道具
-        if (choice.tag) {
-          this.state.tags[choice.tag]++;
-          this.state.collectedLabels.push(`[${choice.label}]`);
-          this.updateBackpack();
-        }
-
-        // 標記該地點已探索（活動中心不消耗）
-        if (currentKey !== 'activity') {
-          this.state.visited[currentKey] = true;
-          this.state.visitedCount = Object.keys(this.state.visited).length;
-        }
-
-        // 顯示結果文字並提供返回地圖按鈕
-        document.getElementById('story-text').innerText = choice.nextText;
-        const optionsContainer = document.getElementById('options-container');
-        optionsContainer.innerHTML = '';
-        
-        const backBtn = document.createElement('button');
-        backBtn.innerText = "🗺️ 整理好心情，返回地圖";
-        backBtn.className = "nav-btn";
-        backBtn.onclick = () => this.renderStory('mapIdle');
-        optionsContainer.appendChild(backBtn);
-      }
-
-      // 更新背包顯示
-      updateBackpack() {
-        const pack = document.getElementById('backpack');
-        if (this.state.collectedLabels.length === 0) {
-          pack.innerText = "（空無一物）";
-        } else {
-          pack.innerHTML = this.state.collectedLabels.map(l => `<span class="tag-badge">${l}</span>`).join('');
-        }
-      }
-
-      // 結算結局
-      calculateEnding() {
-        const { bond, dream, courage } = this.state.tags;
-        let finalType = 'true'; // 預設真結局
-
-        // 判斷是否三者均衡 (最大與最小差小於等於1，且總探索度足夠)
-        const maxVal = Math.max(bond, dream, courage);
-        const minVal = Math.min(bond, dream, courage);
-        
-        if (maxVal - minVal <= 1) {
-          finalType = 'true';
-        } else {
-          // 若不均衡，看哪一個標籤最高
-          if (bond >= dream && bond >= courage) finalType = 'bond';
-          else if (dream >= bond && dream >= courage) finalType = 'dream';
-          else finalType = 'courage';
-        }
-
-        this.showEndingScreen(finalType);
-      }
-
-      // 顯示最終黑幕與打字機效果
-      showEndingScreen(type) {
-        const screen = document.getElementById('ending-screen');
-        const titleEl = document.getElementById('ending-title');
-        const textEl = document.getElementById('typewriter-text');
-        const restartBtn = document.getElementById('restart-btn');
-
-        let titleText = "";
-        let goldenQuote = "";
-
-        // 根據結局種類帶入對應的金句與標題
-        switch(type) {
-          case 'bond':
-            titleText = "結局 A：《未曾走遠的我們》";
-            goldenQuote = "「校園生活不會永遠停留，但回憶會。真正的青春不是形影不離，而是即使走上不同的岔路，一回頭，依然能看見彼此的笑容。」";
-            break;
-          case 'dream':
-            titleText = "結局 B：《刻在心中的星圖》";
-            goldenQuote = "「每一次選擇，都會帶你走向不同的風景。沒有哪一條路是白走的，只要繼續前行，那些迷惘終將連成繁星。」";
-            break;
-          case 'courage':
-            titleText = "結局 C：《破浪的勇者》";
-            goldenQuote = "「最可怕的從來不是未知的明天，而是不敢跨出今天的自己。勇敢，就是帶著害怕依然向前。」";
-            break;
-          case 'true':
-          default:
-            titleText = "真結局：《最後的夏天，最初的自己》";
-            goldenQuote = "「真正重要的不是找到答案，而是在尋找答案的路上學會成長。青春從來沒有標準答案，最完美的解答，就是你親筆寫下的每一次選擇。」";
-            break;
-        }
-
-        // 開啟全黑幕
-        screen.style.display = 'flex';
-        
-        // 1秒後淡入標題
-        setTimeout(() => {
-          titleEl.innerText = titleText;
-          titleEl.style.opacity = '1';
-        }, 1000);
-
-        // 2.5秒後啟動金句打字機效果
-        setTimeout(() => {
-          let index = 0;
-          textEl.innerText = "";
-          const timer = setInterval(() => {
-            if (index < goldenQuote.length) {
-              textEl.innerText += goldenQuote.charAt(index);
-              index++;
-            } else {
-              clearInterval(timer);
-              // 打字完成後顯示重新開始按鈕
-              setTimeout(() => {
-                restartBtn.style.display = 'block';
-              }, 1500);
-            }
-          }, 70); // 每個字出現的速度 (毫秒)
-        }, 2500);
-      }
-    }
-
-    // 啟動遊戲
-    const game = new InteractiveGame();
-    window.onload = () => {
-      game.init();
-    };
-  </script>
-</body>
-</html>
+        title
