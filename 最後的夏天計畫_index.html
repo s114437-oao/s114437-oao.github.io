@@ -19,15 +19,14 @@
       font-family: "Microsoft JhengHei", sans-serif;
     }
 
-    /* --- 滿版佈局核心設定 --- */
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
       display: flex;
       flex-direction: column;
-      height: 100vh; /* 滿版高度 */
-      width: 100vw;  /* 滿版寬度 */
-      overflow: hidden; /* 防止整個頁面出現外層捲軸 */
+      height: 100vh; 
+      width: 100vw;  
+      overflow: hidden; 
     }
 
     #game-container {
@@ -38,7 +37,6 @@
       flex-direction: column;
     }
 
-    /* 頂部狀態列 */
     header {
       background: var(--primary-color);
       color: white;
@@ -46,7 +44,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-shrink: 0; /* 確保標題列不會被壓縮 */
+      flex-shrink: 0; 
     }
 
     header h1 {
@@ -67,30 +65,28 @@
       border: 1px solid rgba(255, 255, 255, 0.4);
     }
 
-    /* 遊戲主畫面彈性佈局 */
     .main-content {
       display: flex;
       flex-direction: row;
-      flex: 1; /* 填滿標題列以下的剩餘空間 */
+      flex: 1; 
       overflow: hidden;
     }
 
     /* 左側地圖區 */
     .map-wrapper {
-      flex: 1.5; /* 佔據比例可微調 */
+      flex: 1.4; 
       background: var(--bg-color);
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: auto; /* 允許地圖區內部滾動 */
+      overflow: auto; 
       padding: 10px;
     }
 
-    /* 增加這層容器來鎖定比例，確保座標絕對準確 */
     .map-inner-container {
       position: relative;
       width: 100%;
-      max-width: 900px; /* 防止在大螢幕上地圖被無限放大變模糊 */
+      max-width: 950px; 
     }
 
     .map-image {
@@ -99,19 +95,23 @@
       display: block;
     }
 
-    /* --- 點擊區域樣式修改 (透明化) --- */
+    /* --- 點擊區域控制面板 --- */
     .clickable-area {
       position: absolute;
       cursor: pointer;
-      background-color: transparent; /* 變成完全透明 */
-      border: none; /* 移除虛線邊框 */
-      border-radius: 6px;
+      border-radius: 8px;
       transition: all 0.2s;
+      
+      /* 【這裡控制透明度】 */
+      /* 目前為完全透明：transparent。如果要看紅框校正，請改為：rgba(255, 0, 0, 0.35) */
+      background-color: transparent; 
+      border: none; /* 如果要看紅框校正，請改為：1px dashed red */
     }
 
-    /* 保留滑鼠移過時微微發亮的提示感，讓玩家知道可以點擊 */
+    /* 滑鼠移過去時會有淡淡的發亮提示 */
     .clickable-area:hover {
-      background-color: rgba(255, 255, 255, 0.3);
+      background-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
     }
 
     /* 右側敘事與對話面板 */
@@ -122,7 +122,7 @@
       flex-direction: column;
       border-left: 1px solid #e0e0e0;
       background: #fafafa;
-      overflow-y: auto; /* 劇情文字太長時可獨立滾動 */
+      overflow-y: auto; 
     }
 
     .story-text {
@@ -145,7 +145,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      margin-top: auto; /* 把按鈕推到面板底部 */
+      margin-top: auto; 
     }
 
     button {
@@ -224,26 +224,28 @@
       color: #000;
     }
 
-    /* --- 手機版響應式設計 (RWD) --- */
+    /* 手機版響應式設計 */
     @media (max-width: 768px) {
       .main-content { 
         flex-direction: column; 
-        overflow-y: auto; /* 手機版讓整體可以上下滑動 */
+        overflow-y: auto; 
       }
       .map-wrapper {
         flex: none;
         overflow: visible;
-        padding: 15px;
+        padding: 10px;
       }
       .story-panel { 
         flex: none;
         border-left: none; 
         border-top: 2px solid #e0e0e0; 
+        padding: 20px;
       }
       header {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
+        padding: 12px 15px;
       }
     }
   </style>
@@ -252,9 +254,9 @@
 
   <div id="game-container">
     <header>
-      <div id="game-title" style="font-weight: bold;">《最後的夏天計畫》</div>
+      <div id="game-title" style="font-weight: bold; font-size: 1.2rem;">《最後的夏天計畫》</div>
       <div style="display: flex; align-items: center; gap: 10px;">
-        <span>🎒 已收集的回憶碎片：</span>
+        <span style="font-size: 0.9rem;">🎒 已收集的回憶碎片：</span>
         <div class="backpack" id="backpack">（空無一物）</div>
       </div>
     </header>
@@ -262,18 +264,18 @@
     <div class="main-content">
       <div class="map-wrapper" id="map-wrapper">
         <div class="map-inner-container">
-          <img src="map.png" alt="校園地圖" class="map-image" onerror="this.style.height='300px'; this.style.background='#ccc';">
+          <img src="map.jpg" alt="校園地圖" class="map-image" onerror="this.style.height='350px'; this.style.background='#ccc';">
           
-          <div class="clickable-area" style="left: 22%; top: 13%; width: 18%; height: 12%;" onclick="game.triggerEvent('art')" title="藝能大樓"></div>
-          <div class="clickable-area" style="left: 52%; top: 24%; width: 11%; height: 13%;" onclick="game.triggerEvent('volleyball')" title="排球場"></div>
-          <div class="clickable-area" style="left: 15%; top: 22%; width: 6%; height: 25%;" onclick="game.triggerEvent('basketball')" title="籃球場"></div>
-          <div class="clickable-area" style="left: 2%; top: 41%; width: 13%; height: 19%;" onclick="game.triggerEvent('gym')" title="體育館"></div>
-          <div class="clickable-area" style="left: 24%; top: 26%; width: 19%; height: 39%;" onclick="game.triggerEvent('track')" title="田徑場"></div>
-          <div class="clickable-area" style="left: 50%; top: 42%; width: 16%; height: 18%;" onclick="game.triggerEvent('activity')" title="學生活動中心"></div>
-          <div class="clickable-area" style="left: 4%; top: 67%; width: 31%; height: 18%;" onclick="game.triggerEvent('general')" title="綜合大樓"></div>
-          <div class="clickable-area" style="left: 39%; top: 67%; width: 8%; height: 14%;" onclick="game.triggerEvent('library')" title="圖書館"></div>
-          <div class="clickable-area" style="left: 48%; top: 68%; width: 8%; height: 13%;" onclick="game.triggerEvent('banyan')" title="榕園"></div>
-          <div class="clickable-area" style="left: 57%; top: 64%; width: 10%; height: 18%;" onclick="game.triggerEvent('science')" title="實驗中心"></div>
+          <div class="clickable-area" style="left: 30%; top: 2%; width: 25%; height: 12%;" onclick="game.triggerEvent('art')" title="藝能大樓"></div>
+          <div class="clickable-area" style="left: 19%; top: 13%; width: 10%; height: 32%;" onclick="game.triggerEvent('basketball')" title="籃球場"></div>
+          <div class="clickable-area" style="left: 2%; top: 35%; width: 18%; height: 25%;" onclick="game.triggerEvent('gym')" title="體育館"></div>
+          <div class="clickable-area" style="left: 34%; top: 15%; width: 28%; height: 52%;" onclick="game.triggerEvent('track')" title="田徑場"></div>
+          <div class="clickable-area" style="left: 77%; top: 13%; width: 19%; height: 24%;" onclick="game.triggerEvent('volleyball')" title="排球場"></div>
+          <div class="clickable-area" style="left: 74%; top: 39%; width: 24%; height: 21%;" onclick="game.triggerEvent('activity')" title="學生活動中心"></div>
+          <div class="clickable-area" style="left: 3%; top: 66%; width: 45%; height: 25%;" onclick="game.triggerEvent('general')" title="綜合大樓"></div>
+          <div class="clickable-area" style="left: 57%; top: 68%; width: 11%; height: 19%;" onclick="game.triggerEvent('library')" title="圖書館"></div>
+          <div class="clickable-area" style="left: 70%; top: 70%; width: 13%; height: 15%;" onclick="game.triggerEvent('banyan')" title="榕園"></div>
+          <div class="clickable-area" style="left: 84%; top: 64%; width: 13%; height: 22%;" onclick="game.triggerEvent('science')" title="實驗中心"></div>
         </div>
       </div>
 
@@ -295,6 +297,7 @@
   </div>
 
   <script>
+    // 劇情腳本資料庫保持不變
     const scriptData = {
       start: {
         title: "故事開始",
@@ -527,7 +530,7 @@
             break;
           case 'dream':
             titleText = "結局 B：《刻在心中的星圖》";
-            goldenQuote = "「每一次選擇，都會帶你走向不同的風景。沒有哪一條路是白走的，只要繼續前行，那些迷惘終將連成繁星。」";
+            goldenQuote = "「每一次選擇，都會帶你走向不同的風景。沒有哪一條路是白走。只要繼續前行，那些迷惘終將連成繁星。」";
             break;
           case 'courage':
             titleText = "結局 C：《破浪的勇者》";
